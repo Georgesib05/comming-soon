@@ -81,8 +81,8 @@ function App() {
         </form>
 
         <div className="social-links">
-          <a href="#" className="social-link">Instagram</a>
-          <a href="#" className="social-link">Facebook</a>
+          <a href="https://www.instagram.com/illusion.leb?igsh=MW8xM2ViMTgwYmpsdg%3D%3D&utm_source=qr" className="social-link">Instagram</a>
+          <a href="https://www.facebook.com/share/16YqstRy9c/?mibextid=wwXIfr" className="social-link">Facebook</a>
         </div>
       </div>
     </div>
