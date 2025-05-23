@@ -1,0 +1,35 @@
+name: Deploy To Production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to AWS
+        uses: reggionick/s3-deploy@v3
+        with:
+          folder: dist
+          bucket: www.illusion-lb.com
+          bucket-region: us-east-2
+          dist-id: E3A99OP40OP5S1
+          invalidation: /
+          delete-removed: true
+          no-cache: true
+          private: true
