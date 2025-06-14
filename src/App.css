@@ -1,148 +1,41 @@
-.coming-soon {
+#root {
   min-height: 100vh;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
-  color: white;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-
-.content {
-  text-align: center;
-  padding: 2rem;
-  max-width: 800px;
-  width: 90%;
-}
-
-.logo-container {
-  margin-bottom: 2rem;
+  flex-direction: column;
 }
 
 .logo {
-  max-width: 200px;
-  height: auto;
-  margin-bottom: 2rem;
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
-h1 {
-  font-size: 3.5rem;
-  margin-bottom: 1rem;
-  background: linear-gradient(45deg, #fff, #ccc);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: fadeIn 1s ease-in;
-}
-
-.tagline {
-  font-size: 1.5rem;
-  color: #888;
-  margin-bottom: 3rem;
-  animation: fadeIn 1s ease-in 0.5s both;
-}
-
-.subscribe-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  max-width: 500px;
-  margin: 0 auto 3rem;
-  animation: fadeIn 1s ease-in 1.5s both;
-}
-
-.input-container {
-  position: relative;
-  width: 100%;
-}
-
-.subscribe-form input {
-  width: 100%;
-  padding: 1rem;
-  border: 2px solid transparent;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  font-size: 1rem;
-  transition: border-color 0.3s ease;
-}
-
-.subscribe-form input.error {
-  border-color: #ff6b6b;
-}
-
-.subscribe-form input:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.error-message {
-  position: absolute;
-  left: 0;
-  bottom: -1.5rem;
-  color: #ff6b6b;
-  font-size: 0.875rem;
-  text-align: left;
-}
-
-.subscribe-form input::placeholder {
-  color: #888;
-}
-
-.subscribe-form button {
-  padding: 1rem 2rem;
-  border: none;
-  border-radius: 4px;
-  background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.subscribe-form button:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.subscribe-form button:hover:not(:disabled) {
-  transform: translateY(-2px);
-}
-
-.social-links {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  animation: fadeIn 1s ease-in 2s both;
-}
-
-.social-link {
-  color: #888;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-.social-link:hover {
-  color: white;
-}
-
-@keyframes fadeIn {
+@keyframes logo-spin {
   from {
-    opacity: 0;
-    transform: translateY(20px);
+    transform: rotate(0deg);
   }
   to {
-    opacity: 1;
-    transform: translateY(0);
+    transform: rotate(360deg);
   }
 }
 
-@media (max-width: 768px) {
-  .subscribe-form {
-    padding: 0 1rem;
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
   }
+}
 
-  .subscribe-form button {
-    width: 100%;
-  }
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
 }
