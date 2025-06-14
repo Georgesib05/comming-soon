@@ -78,7 +78,7 @@ const initialProducts = [
     image: '/visual-trap.png',
     category: 'T-Shirts',
     dateAdded: new Date('2024-03-10'),
-    availableSizes: ['S', 'M', 'L', 'XXL']
+    availableSizes: ['S', 'M', 'L']
   },
   
   // Add more products here
