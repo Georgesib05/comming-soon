@@ -52,6 +52,7 @@ interface Product {
   dateAdded: Date;
   isPopular?: boolean;
   availableSizes: string[];
+  inStock?: boolean;
 }
 
 interface CartProduct extends Product {
@@ -69,7 +70,8 @@ const initialProducts = [
     category: 'T-Shirts',
     dateAdded: new Date('2024-03-15'),
     isPopular: true,
-    availableSizes: ['S', 'M', 'L']
+    availableSizes: ['S', 'M', 'L'],
+    inStock: false
   },
   {
     id: 2,
@@ -78,7 +80,8 @@ const initialProducts = [
     image: '/visual-trap.png',
     category: 'T-Shirts',
     dateAdded: new Date('2024-03-10'),
-    availableSizes: ['S', 'M', 'L']
+    availableSizes: ['S', 'M', 'L'],
+    inStock: false
   },
   
   // Add more products here
@@ -213,6 +216,7 @@ const CategoryProducts: React.FC<CategoryProductsProps> = ({
                       h="full"
                       objectFit="cover"
                       borderRadius="md"
+                      opacity={product.inStock === false ? 0.5 : 1}
                     />
                     {product.isPopular && (
                       <Box
@@ -232,6 +236,25 @@ const CategoryProducts: React.FC<CategoryProductsProps> = ({
                         Popular
                       </Box>
                     )}
+                    {product.inStock === false && (
+                      <Box
+                        position="absolute"
+                        top="50%"
+                        left="50%"
+                        transform="translate(-50%, -50%)"
+                        bg="red.500"
+                        color="white"
+                        px={3}
+                        py={2}
+                        borderRadius="md"
+                        fontSize="sm"
+                        fontWeight="bold"
+                        boxShadow="md"
+                        zIndex={2}
+                      >
+                        Out of Stock
+                      </Box>
+                    )}
                   </Box>
                   <VStack align="start" spacing={3} flex="1" w="full">
                     <Text 
@@ -249,7 +272,7 @@ const CategoryProducts: React.FC<CategoryProductsProps> = ({
                     </Text>
 
                     {/* Updated Quantity Selection */}
-                    <FormControl>
+                    <FormControl isDisabled={product.inStock === false}>
                       <FormLabel fontSize="sm">Quantity</FormLabel>
                       <NumberInput
                         size="sm"
@@ -262,6 +285,7 @@ const CategoryProducts: React.FC<CategoryProductsProps> = ({
                         onBlur={() => handleQuantityBlur(product.id)}
                         keepWithinRange={false}
                         clampValueOnBlur={true}
+                        isDisabled={product.inStock === false}
                       >
                         <NumberInputField />
                         <NumberInputStepper>
@@ -272,7 +296,7 @@ const CategoryProducts: React.FC<CategoryProductsProps> = ({
                     </FormControl>
 
                     {/* Multiple Size Selection */}
-                    <FormControl isInvalid={sizeErrors[product.id]}>
+                    <FormControl isInvalid={sizeErrors[product.id]} isDisabled={product.inStock === false}>
                       <FormLabel fontSize="sm">
                         {(quantities[product.id] || 1) > 1 ? 'Sizes' : 'Size'}
                       </FormLabel>
@@ -285,6 +309,7 @@ const CategoryProducts: React.FC<CategoryProductsProps> = ({
                               placeholder={`Size ${index + 1}`}
                               size="sm"
                               w="100px"
+                              isDisabled={product.inStock === false}
                             >
                               {product.availableSizes.map(size => (
                                 <option key={size} value={size}>
@@ -304,8 +329,9 @@ const CategoryProducts: React.FC<CategoryProductsProps> = ({
                       colorScheme="blackAlpha"
                       size={{ base: "sm", md: "md" }}
                       onClick={() => handleAddToCart(product)}
+                      isDisabled={product.inStock === false}
                     >
-                      Add to Cart
+                      {product.inStock === false ? 'Out of Stock' : 'Add to Cart'}
                     </Button>
                   </VStack>
                 </VStack>
@@ -350,18 +376,19 @@ const Shop = () => {
   // Updated state for multiple sizes
   const [selectedSizes, setSelectedSizes] = useState<{ [key: number]: string[] }>({});
   const [quantities, setQuantities] = useState<Quantities>({});
-  const [] = useState<{ [key: number]: string }>({});
   const [sizeErrors, setSizeErrors] = useState<{ [key: number]: boolean }>({});
   
   const cardBgColor = useColorModeValue('white', 'gray.800');
   const textColor = useColorModeValue('gray.700', 'gray.300');
+  const alertBgColor = useColorModeValue('gray.50', 'gray.800');
+  const alertBorderColor = useColorModeValue('gray.200', 'gray.700');
 
   const categories = Array.from(new Set(initialProducts.map(product => product.category)));
 
   const handleSortToggle = (sortOption: string) => {
     setActiveSortOptions(prevOptions => {
       // Find which group the selected option belongs to
-      const group = Object.entries(sortGroups).find(([_, options]) => 
+      const group = Object.entries(sortGroups).find(([, options]) => 
         options.includes(sortOption as SortOption)
       )?.[0];
 
@@ -380,6 +407,7 @@ const Shop = () => {
     });
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const filterProducts = () => {
     let filtered = [...initialProducts];
     
@@ -425,7 +453,7 @@ const Shop = () => {
   // Update filters when search, category, or sort changes
   useEffect(() => {
     filterProducts();
-  }, [searchQuery, selectedCategory, activeSortOptions]);
+  }, [searchQuery, selectedCategory, activeSortOptions, filterProducts]);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
@@ -476,6 +504,19 @@ const Shop = () => {
   };
 
   const handleAddToCart = (product: Product) => {
+    // Check if product is out of stock
+    if (product.inStock === false) {
+      toast({
+        title: 'Product out of stock',
+        description: `${product.name} is currently out of stock`,
+        status: 'error',
+        duration: 2000,
+        isClosable: true,
+        position: 'top-right',
+      });
+      return;
+    }
+
     const quantity = quantities[product.id] || 1;
     const sizes = selectedSizes[product.id] || Array(quantity).fill('');
 
@@ -571,6 +612,7 @@ const Shop = () => {
                 h="full"
                 objectFit="cover"
                 borderRadius="md"
+                opacity={product.inStock === false ? 0.5 : 1}
               />
               {product.isPopular && (
                 <Box
@@ -590,6 +632,25 @@ const Shop = () => {
                   Popular
                 </Box>
               )}
+              {product.inStock === false && (
+                <Box
+                  position="absolute"
+                  top="50%"
+                  left="50%"
+                  transform="translate(-50%, -50%)"
+                  bg="red.500"
+                  color="white"
+                  px={3}
+                  py={2}
+                  borderRadius="md"
+                  fontSize="sm"
+                  fontWeight="bold"
+                  boxShadow="md"
+                  zIndex={2}
+                >
+                  Out of Stock
+                </Box>
+              )}
             </Box>
             <VStack align="start" spacing={3} flex="1" w="full">
               <Text 
@@ -607,7 +668,7 @@ const Shop = () => {
               </Text>
 
               {/* Updated Quantity Selection */}
-              <FormControl>
+              <FormControl isDisabled={product.inStock === false}>
                 <FormLabel fontSize="sm">Quantity</FormLabel>
                 <NumberInput
                   size="sm"
@@ -620,6 +681,7 @@ const Shop = () => {
                   onBlur={() => handleQuantityBlur(product.id)}
                   keepWithinRange={false}
                   clampValueOnBlur={true}
+                  isDisabled={product.inStock === false}
                 >
                   <NumberInputField />
                   <NumberInputStepper>
@@ -630,7 +692,7 @@ const Shop = () => {
               </FormControl>
 
               {/* Multiple Size Selection */}
-              <FormControl isInvalid={sizeErrors[product.id]}>
+              <FormControl isInvalid={sizeErrors[product.id]} isDisabled={product.inStock === false}>
                 <FormLabel fontSize="sm">
                   {(quantities[product.id] || 1) > 1 ? 'Sizes' : 'Size'}
                 </FormLabel>
@@ -643,6 +705,7 @@ const Shop = () => {
                         placeholder={`Size ${index + 1}`}
                         size="sm"
                         w="100px"
+                        isDisabled={product.inStock === false}
                       >
                         {product.availableSizes.map(size => (
                           <option key={size} value={size}>
@@ -662,8 +725,9 @@ const Shop = () => {
                 colorScheme="blackAlpha"
                 size={{ base: "sm", md: "md" }}
                 onClick={() => handleAddToCart(product)}
+                isDisabled={product.inStock === false}
               >
-                Add to Cart
+                {product.inStock === false ? 'Out of Stock' : 'Add to Cart'}
               </Button>
             </VStack>
           </VStack>
@@ -678,9 +742,9 @@ const Shop = () => {
         <Alert
           status="info"
           variant="subtle"
-          bg={useColorModeValue('gray.50', 'gray.800')}
+          bg={alertBgColor}
           borderBottom="1px"
-          borderColor={useColorModeValue('gray.200', 'gray.700')}
+          borderColor={alertBorderColor}
           py={3}
         >
           <Container maxW={'7xl'} display="flex" alignItems="center">
